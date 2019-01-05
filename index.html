@@ -1,0 +1,237 @@
+<html>
+  <title>Basic Counting Game</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+  html, body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+  }
+  body {
+      background: WHITE;
+      font-family: Verdana, Helvetica, Arial, sans-serif;
+  }
+  span.letter {
+      font-size: 16em;
+      font-weight: bold;
+      /*text-shadow: 8px 8px 11px rgba(150, 150, 150, 0.74);*/
+      text-shadow: -5px 0 black, 0 5px black, 5px 0 black, 0 -5px black;
+      z-index:-99;
+  }
+  select {
+      background: WHITE;
+      border:1px #444444 solid;
+  }
+  #infoAndCredits {
+      z-index:99;
+      position: absolute;
+      left:8px;
+      bottom:8px;
+      padding:2px;
+      font-size:0.8em;
+  }
+  #credits {
+      font-size:0.7em;
+  }
+  </style>
+  <script>
+    var allElements = [];
+    var count = 0;
+    var keyheld = false;
+    var voice = null;
+    var voices = null;
+    var gameTimer = null;
+    var processingKey = false;
+    var imageNumber = 0;
+    var wrongAudio;
+    var correctAudio;
+
+    var images = [
+      {
+        word: "Balls",
+        image: "https://upload.wikimedia.org/wikipedia/commons/7/7f/Generic_football.png",
+        imageCredits: "<a href='https://www.freeimages.com/photo/soccer-ball-1466760'>Ball by Christopher Bruno</a> & <a href='https://commons.wikimedia.org/wiki/File:Generic_football.png'>Ed g2s (CC BY-SA 2.0)</a>"
+      },
+      {
+        word: "Umbrellas",
+        image: "https://upload.wikimedia.org/wikipedia/commons/0/06/Umbrella.png",
+        imageCredits: "<a href='https://commons.wikimedia.org/wiki/File:Umbrella.png'>Umbrella - cdc.gov (PD)</a>"
+      }
+    ];
+
+    function init() {
+        newGame();
+    }
+    
+    document.onkeyup = function(e) {
+        keyheld = false;
+    }
+
+    document.onkeydown = function(e) {
+        e = e || window.event;
+        var charCode = (typeof e.which == "number") ? e.which : e.keyCode;
+        if (charCode && !keyheld) {
+            var button = String.fromCharCode(charCode);
+            if (charCode>=48 && charCode<=57) {
+                number = charCode - 48;
+                console.log("number " + number);
+                numberPressed(number);
+            }
+        } 
+    };
+
+    document.onclick = function() {
+    };
+
+    function numberPressed(number) {
+        if (number == count) {
+            correctNumberPressed();
+        } else {
+            wrongNumberPressed();
+        }
+    }
+
+    function correctNumberPressed() {
+        clearAll();
+        if (processingKey) return;
+        processingKey = true;
+        correctSound();
+       
+        document.getElementById('credits').style.display = "none";
+        gameTimer = setInterval(function(){ celebrateCorrect() }, 100);
+        
+        // New game after 2 seconds
+        setTimeout(function() {
+            clearInterval(gameTimer);
+    	    document.body.style.backgroundColor = "WHITE";
+            newGame();
+            processingKey = false;
+        }, 1300);
+        
+        celebrateCorrect(1);
+    }
+    
+    function celebrateCorrect() {
+    	document.body.style.backgroundColor = randomLightColour();
+    	drawColourfulText(count);
+    }
+
+    function wrongNumberPressed() {
+        clearAll();
+        if (processingKey) return
+        wrongSound();
+
+        // Re-draw images afer 2 seconds
+        gameTimer = setTimeout(function() {
+            showImages(count, imageNumber);
+            processingKey = false;
+        }, 3000);
+    }
+
+    function newGame() {
+        clearAll();
+
+        // Choose a random count, not the same as the previous
+        prevCount = count;
+        do {
+            max = 6;
+            min = 2;
+            count = Math.floor(Math.random() * (max - min)) + min;
+        }
+        while (count==prevCount)
+
+        imageNumber = Math.floor(Math.random() * images.length);
+        showImages(count, imageNumber);
+    }
+
+    function clearAll() {
+        while (allElements.length > 0) {
+            var removed = allElements.shift();
+            document.body.removeChild(removed);
+        }
+    }
+
+    function showImages(count, imageNumber) {        
+        var imageData = images[imageNumber];
+        var imageURL = imageData['image'];
+        var imageCredits = imageData['imageCredits'];
+        for (i = 0; i < count; i++) {
+            var elem = document.createElement("span");
+            elem.setAttribute("class", "image");
+            elem.innerHTML = "<img src='" + imageURL + "'>";
+            elem.style.position = "absolute";
+            document.body.appendChild(elem);
+
+            // TODO: position with CSS grid instead of this dodgy coordinate logic
+
+            //var x = Math.round(Math.random() * (window.innerWidth - elem.clientWidth));
+            //var y = Math.round(Math.random() * (window.innerHeight - elem.clientHeight));
+            var x = 50 + (i % 3) * 300; //elem.clientWidth;
+            var y =  Math.floor(i / 3) * 300;
+
+            elem.style.left = x + "px";
+            elem.style.top = y + "px";
+
+            allElements.push(elem);
+        }
+        document.getElementById('credits').style.display = "block";
+        document.getElementById('credits').innerHTML = imageCredits;
+    }
+    
+   
+    function drawColourfulText(text) {
+        var elem = document.createElement("span");
+        elem.setAttribute("class", "letter");
+        elem.textContent = text;
+        elem.style.position = "absolute";
+
+        document.body.appendChild(elem);
+        var x = Math.round(Math.random() * (window.innerWidth - elem.clientWidth));
+        var y = Math.round(Math.random() * (window.innerHeight - (elem.clientHeight - 100))) - 70;
+
+        elem.style.left = x + "px";
+        elem.style.top = y + "px";
+        elem.style.color = randomLightColour(); //colours[Math.floor(Math.random()*colours.length)];
+        allElements.push(elem);
+    }
+
+    function randomLightColour() {
+        var hue = Math.floor(Math.random() * 360);
+        var saturation = 100;
+        var varience = 50;
+        return 'hsl(' + hue + ', ' + saturation + '%, ' + varience + '%)';
+    }
+    
+    // http://stackoverflow.com/a/901144/338265
+    function getParameterByName(name) {
+        var url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+    
+    function wrongSound() {
+    	if (typeof wrongAudio === 'undefined') wrongAudio = new Audio('wrong.mp3');
+        wrongAudio.play()
+    }
+    function correctSound() {
+    	if (typeof correctAudio === 'undefined') correctAudio = new Audio('correct.mp3');
+        correctAudio.play()
+    }
+  </script>
+</html>
+<body onLoad="init();">
+
+<div id="infoAndCredits">
+   (<a href="//harrywood.co.uk/blog/2016/09/10/keyboard-letters-game/" title="Blog post about this">About</a>)
+   <span id="credits">
+   </span>
+</div>
+</body>
+</html>
