@@ -44,6 +44,7 @@
     var voice = null;
     var voices = null;
     var gameTimer = null;
+    var celebrationTimer = null;
     var processingKey = false;
     var imageNumber = 0;
     var wrongAudio;
@@ -83,7 +84,7 @@
       {
         word: "Lemons",
         image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Lemon_with_white_background.jpg/320px-Lemon_with_white_background.jpg",
-        imageCredits: "<a href='https://commons.wikimedia.org/wiki/File:Lemon_with_white_background.jpg'>User:Bordercolliez CC0</a>"
+        imageCredits: "<a href='https://commons.wikimedia.org/wiki/File:Lemon_with_white_background.jpg'>Lemon photo by User:Bordercolliez CC0</a>"
       },
       {
         word: "Eggs",
@@ -95,7 +96,7 @@
     function init() {
         newGame();
     }
-    
+
     document.onkeyup = function(e) {
         keyheld = false;
     }
@@ -110,7 +111,7 @@
                 console.log("number " + number);
                 numberPressed(number);
             }
-        } 
+        }
     };
 
     document.onclick = function() {
@@ -125,31 +126,32 @@
     }
 
     function correctNumberPressed() {
-        clearAll();
         if (processingKey) return;
         processingKey = true;
+        clearAll();
         correctSound();
-       
+
         document.getElementById('credits').style.display = "none";
-        gameTimer = setInterval(function(){ celebrateCorrect() }, 100);
-        
+        celebrationTimer = setInterval( function(){ celebrateCorrect() }, 80);
+
         // New game after 1.3 seconds
         setTimeout(function() {
-            clearInterval(gameTimer);
-    	    document.body.style.backgroundColor = "WHITE";
+            clearInterval(celebrationTimer);
+            document.body.style.backgroundColor = "WHITE";
             newGame();
             processingKey = false;
         }, 1300);
     }
-    
+
     function celebrateCorrect() {
-    	document.body.style.backgroundColor = randomLightColour();
-    	drawColourfulText(count);
+        if (!processingKey) return;
+        drawColourfulText(count);
+        if (Math.random()<0.3) document.body.style.backgroundColor = randomLightColour();
     }
 
     function wrongNumberPressed() {
-        clearAll();
         if (processingKey) return
+        clearAll();
         wrongSound();
 
         // Re-draw images afer 2 seconds
@@ -182,7 +184,7 @@
         }
     }
 
-    function showImages(count, imageNumber) {        
+    function showImages(count, imageNumber) {
         var imageData = images[imageNumber];
         var imageURL = imageData['image'];
         var imageCredits = imageData['imageCredits'];
@@ -208,8 +210,8 @@
         document.getElementById('credits').style.display = "block";
         document.getElementById('credits').innerHTML = imageCredits;
     }
-    
-   
+
+
     function drawColourfulText(text) {
         var elem = document.createElement("span");
         elem.setAttribute("class", "letter");
@@ -232,7 +234,7 @@
         var varience = 50;
         return 'hsl(' + hue + ', ' + saturation + '%, ' + varience + '%)';
     }
-    
+
     // http://stackoverflow.com/a/901144/338265
     function getParameterByName(name) {
         var url = window.location.href;
@@ -243,13 +245,13 @@
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
-    
+
     function wrongSound() {
-    	if (typeof wrongAudio === 'undefined') wrongAudio = new Audio('wrong.mp3');
+        if (typeof wrongAudio === 'undefined') wrongAudio = new Audio('wrong.mp3');
         wrongAudio.play()
     }
     function correctSound() {
-    	if (typeof correctAudio === 'undefined') correctAudio = new Audio('correct.mp3');
+        if (typeof correctAudio === 'undefined') correctAudio = new Audio('correct.mp3');
         correctAudio.play()
     }
   </script>
