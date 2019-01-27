@@ -47,8 +47,9 @@
     var celebrationTimer = null;
     var processingKey = false;
     var imageNumber = 0;
-    var wrongAudio;
-    var correctAudio;
+    var correctInARow = 0;
+    var wrongInARow = 0;
+    var sounds = {};
 
     var images = [
       {
@@ -128,8 +129,17 @@
     function correctNumberPressed() {
         if (processingKey) return;
         processingKey = true;
+
+        correctInARow++;
+        wrongInARow = 0;
+
         clearAll();
-        correctSound();
+        if (correctInARow==2) {
+            playSound("well-done");
+            correctInARow = 0;
+        } else {
+            playSound("correct");
+        }
 
         document.getElementById('credits').style.display = "none";
         celebrationTimer = setInterval( function(){ celebrateCorrect() }, 80);
@@ -152,7 +162,15 @@
     function wrongNumberPressed() {
         if (processingKey) return
         clearAll();
-        wrongSound();
+
+        wrongInARow++;
+        correctInARow = 0;
+        if (wrongInARow==5) {
+            playSound("not-guessing")
+            wrongInARow = 0;
+        } else {
+            playSound("wrong");
+        }
 
         // Re-draw images afer 2 seconds
         gameTimer = setTimeout(function() {
@@ -246,14 +264,11 @@
         return decodeURIComponent(results[2].replace(/\+/g, " "));
     }
 
-    function wrongSound() {
-        if (typeof wrongAudio === 'undefined') wrongAudio = new Audio('wrong.mp3');
-        wrongAudio.play()
+    function playSound(name) {
+        if (typeof sounds[name] === 'undefined') sounds[name] = new Audio(name + ".mp3");
+        sounds[name].play()
     }
-    function correctSound() {
-        if (typeof correctAudio === 'undefined') correctAudio = new Audio('correct.mp3');
-        correctAudio.play()
-    }
+
   </script>
 </html>
 <body onLoad="init();">
