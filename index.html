@@ -50,6 +50,7 @@
     var correctInARow = 0;
     var wrongInARow = 0;
     var sounds = {};
+    var fixedImage = null;
 
     var images = [
       {
@@ -100,6 +101,8 @@
     ];
 
     function init() {
+        fixedImage = getParameterByName("fixed-image");
+
         newGame();
     }
 
@@ -196,8 +199,19 @@
         }
         while (count==prevCount)
 
-        imageNumber = Math.floor(Math.random() * images.length);
-        showImages(count, imageNumber);
+        showImages(count, chooseImage());
+    }
+
+    function chooseImage() {
+        if (fixedImage!=null) {
+            for (imageNumber = 0; imageNumber < images.length; imageNumber++) {
+                if (images[imageNumber]["word"].toLowerCase() == fixedImage) {
+                    return imageNumber;
+                }
+            }
+        } else {
+            return Math.floor(Math.random() * images.length);
+        }
     }
 
     function clearAll() {
