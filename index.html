@@ -21,6 +21,14 @@
       text-shadow: -5px 0 black, 0 5px black, 5px 0 black, 0 -5px black;
       z-index:-99;
   }
+  #instructions {
+      z-index:99;
+      position: absolute;
+      bottom:40px;
+      font-size: 1.2em;
+      width:100%;
+      text-align:center;
+  }
   select {
       background: WHITE;
       border:1px #444444 solid;
@@ -127,6 +135,7 @@
     };
 
     function numberPressed(number) {
+        document.getElementById('instructions').style.display = 'none';
         if (number == count) {
             correctNumberPressed();
         } else {
@@ -291,6 +300,11 @@
   </script>
 </html>
 <body onLoad="init();">
+
+<div id="instructions">
+   <p><b>Hit the number keys</b></p>
+   <p>(if you need to learn how to count)</p>
+</div>
 
 <div id="infoAndCredits">
    (<a href="https://github.com/harry-wood/counting-basic" title="README description, code, and issue tracker">Github</a>)
