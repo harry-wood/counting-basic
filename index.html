@@ -103,8 +103,10 @@
       },
       {
         word: "Fans",
-        image: "./images/fan.gif",
-        imageCredits: "<a href='https://pixabay.com/illustrations/fan-appliance-home-equipment-3581090/'>Fan image by joealfaraby, public domain</a>"
+        image: "./images/fan-stopped.png",
+        imageCredits: "<a href='https://pixabay.com/illustrations/fan-appliance-home-equipment-3581090/'>Fan image by joealfaraby, public domain</a>",
+        celebration: "SwapImage",
+        celebrationImage: "./images/fan-animated.gif"
       }
     ];
 
@@ -158,9 +160,13 @@
             playSound("correct");
         }
 
-        document.getElementById('credits').style.display = "none";
-        celebrationTimer = setInterval( function(){ celebrateCorrect() }, 80);
+        if (images[imageNumber]['celebration']=="SwapImage") {
+            showImageByURL(count, images[imageNumber]['celebrationImage']);
 
+        } else {
+            document.getElementById('credits').style.display = "none";
+            celebrationTimer = setInterval( function(){ numberFlickerCelebration() }, 80);
+        }
         // New game after 1.3 seconds
         setTimeout(function() {
             clearInterval(celebrationTimer);
@@ -170,7 +176,7 @@
         }, 1300);
     }
 
-    function celebrateCorrect() {
+    function numberFlickerCelebration() {
         if (!processingKey) return;
         drawColourfulText(count);
         if (Math.random()<0.3) document.body.style.backgroundColor = randomLightColour();
@@ -178,6 +184,7 @@
 
     function wrongNumberPressed() {
         if (processingKey) return
+
         clearAll();
 
         wrongInARow++;
@@ -191,7 +198,7 @@
 
         // Re-draw images afer 2 seconds
         gameTimer = setTimeout(function() {
-            showImages(count, imageNumber);
+            showImageByNumber(count, imageNumber);
             processingKey = false;
         }, 3000);
     }
@@ -209,11 +216,12 @@
         while (count==prevCount)
 
         chooseImage();
-        showImages(count, imageNumber);
+        showImageByNumber(count, imageNumber);
     }
 
     function chooseImage() {
         if (fixedImage!=null) {
+            // fixedImage ("fixed-image" URL param) is set
             for (var i = 0; i < images.length; i++) {
                 if (images[i]["word"].toLowerCase() == fixedImage) {
                     imageNumber = i;
@@ -231,10 +239,16 @@
         }
     }
 
-    function showImages(count, imageNumber) {
+    function showImageByNumber(count, imageNumber) {
         var imageData = images[imageNumber];
         var imageURL = imageData['image'];
         var imageCredits = imageData['imageCredits'];
+        showImageByURL(count, imageURL);
+        document.getElementById('credits').style.display = "block";
+        document.getElementById('credits').innerHTML = imageCredits;
+    }
+
+    function showImageByURL(count, imageURL) {
         for (i = 0; i < count; i++) {
             var elem = document.createElement("span");
             elem.setAttribute("class", "image");
@@ -254,10 +268,7 @@
 
             allElements.push(elem);
         }
-        document.getElementById('credits').style.display = "block";
-        document.getElementById('credits').innerHTML = imageCredits;
     }
-
 
     function drawColourfulText(text) {
         var elem = document.createElement("span");
