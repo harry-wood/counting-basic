@@ -208,18 +208,19 @@
         }
         while (count==prevCount)
 
-        showImages(count, chooseImage());
+        chooseImage();
+        showImages(count, imageNumber);
     }
 
     function chooseImage() {
         if (fixedImage!=null) {
-            for (imageNumber = 0; imageNumber < images.length; imageNumber++) {
-                if (images[imageNumber]["word"].toLowerCase() == fixedImage) {
-                    return imageNumber;
+            for (var i = 0; i < images.length; i++) {
+                if (images[i]["word"].toLowerCase() == fixedImage) {
+                    imageNumber = i;
                 }
             }
         } else {
-            return Math.floor(Math.random() * images.length);
+            imageNumber = Math.floor(Math.random() * images.length);
         }
     }
 
