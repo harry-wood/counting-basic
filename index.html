@@ -46,6 +46,8 @@
   }
   </style>
   <script>
+    var max_answer = 6;
+    var min_answer = 2;
     var allElements = [];
     var count = 0;
     var keyheld = false;
@@ -209,9 +211,7 @@
         // Choose a random count, not the same as the previous
         prevCount = count;
         do {
-            max = 6;
-            min = 2;
-            count = Math.floor(Math.random() * (max - min)) + min;
+            count = Math.floor(Math.random() * (max_answer - min_answer + 1)) + min_answer;
         }
         while (count==prevCount)
 
